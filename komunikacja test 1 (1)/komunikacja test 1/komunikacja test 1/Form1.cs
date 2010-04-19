@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Xml;
 
 namespace komunikacja_test_1
 {
@@ -20,84 +21,56 @@ namespace komunikacja_test_1
         public Form1()
         {
             InitializeComponent();
-            addData();
+            parse();
         }
-        private void addData() 
+        private void parse() 
         {
-            
-            przystanki.Add(new Przystanek("a"));
-            przystanki.Add(new Przystanek("b"));
-            przystanki.Add(new Przystanek("c"));
-            przystanki.Add(new Przystanek("d"));
-            przystanki.Add(new Przystanek("e"));
-            przystanki.Add(new Przystanek("f"));
+            DirectoryInfo di = new DirectoryInfo(@"E:\Moje bzdury\_STUDIA\8 Semestr\psi 3\program\rozklady_xml\zdik");
 
-            linie.Add(new Linia("1"));
-            linie.Add(new Linia("2"));
-            linie.Add(new Linia("3"));
-            linie.Add(new Linia("4"));
-            linie.Add(new Linia("5"));
-            linie.Add(new Linia("6"));
-
-            linie[0].wyjazd.Add(new DateTime(2000, 11, 11, 5, 0, 0));
-            linie[0].wyjazd.Add(new DateTime(2000, 11, 11, 5, 6, 0));
-            
-            linie[0].dodajPrzystanek(przystanki[0], 0);
-            linie[0].dodajPrzystanek(przystanki[1], 10);
-            linie[0].dodajPrzystanek(przystanki[2], 110);
-
-
-            linie[1].wyjazd.Add(new DateTime(2000, 11, 11, 5, 10, 0));
-            linie[1].dodajPrzystanek(przystanki[5], 0);
-            linie[1].dodajPrzystanek(przystanki[1], 5);
-            linie[1].dodajPrzystanek(przystanki[3], 13);
-
-            linie[2].wyjazd.Add(new DateTime(2000, 11, 11, 5, 22, 0));
-            linie[2].wyjazd.Add(new DateTime(2000, 11, 11, 6, 27, 0));
-            linie[2].wyjazd.Add(new DateTime(2000, 11, 11, 6, 30, 0));
-            linie[2].dodajPrzystanek(przystanki[3], 0);
-            linie[2].dodajPrzystanek(przystanki[4], 9);
-
-            linie[3].wyjazd.Add(new DateTime(2000, 11, 11, 5, 35, 0));
-            linie[3].wyjazd.Add(new DateTime(2000, 11, 11, 6, 50, 0));
-            linie[3].dodajPrzystanek(przystanki[4], 0);
-            linie[3].dodajPrzystanek(przystanki[2], 3);
-
-            linie[4].wyjazd.Add(new DateTime(2000, 11, 11, 5, 0, 0));
-            linie[4].dodajPrzystanek(przystanki[0], 0);
-            linie[4].dodajPrzystanek(przystanki[5], 10);
-
-            linie[5].wyjazd.Add(new DateTime(2000, 11, 11, 5, 20, 0));
-            linie[5].dodajPrzystanek(przystanki[5], 0);
-            linie[5].dodajPrzystanek(przystanki[2], 50);
-
-            przystanki[0].dodajLinie(linie[0]);
-            przystanki[0].dodajLinie(linie[4]);
-
-            przystanki[1].dodajLinie(linie[0]);
-            przystanki[1].dodajLinie(linie[1]);
-
-            przystanki[2].dodajLinie(linie[0]);
-            przystanki[2].dodajLinie(linie[3]);
-            przystanki[2].dodajLinie(linie[5]);
-
-            przystanki[3].dodajLinie(linie[1]);
-            przystanki[3].dodajLinie(linie[2]);
-
-            przystanki[4].dodajLinie(linie[2]);
-            przystanki[4].dodajLinie(linie[3]);
-
-            przystanki[5].dodajLinie(linie[1]);
-            przystanki[5].dodajLinie(linie[4]);
-            przystanki[5].dodajLinie(linie[5]);
-
-            foreach(Przystanek p in przystanki)
+            foreach (FileInfo fi in di.GetFiles())
             {
-                comboBox1.Items.Add(p.id);
-                comboBox2.Items.Add(p.id);
+                if (fi.Name != "01282.xml") continue;
+                if (fi.Name == "0119.xml") continue;
+                parseFile2(fi.FullName);
             }
+
+            usunWielokrotnePrzystanki();
+
+            foreach (Przystanek p in przystanki)
+            {
+                comboBox1.Items.Add(p.nazwa);
+                comboBox2.Items.Add(p.nazwa);
+            }
+            comboBox1.Sorted = true;
+            comboBox2.Sorted = true;
         }
-        private void search(string _from, string to,int nodes,int initialNodes,string previousLine,DateTime godzina) 
+        private void usunWielokrotnePrzystanki()
+        {
+            List<Przystanek> przystankiPom = new List<Przystanek>();
+            foreach (Przystanek p in przystanki) 
+            {
+                Przystanek przystanekWPom = przystankiPom.Find(
+                        delegate(Przystanek p2) 
+                        {
+                            return p2.nazwa == p.nazwa;
+                        });
+
+                if (przystanekWPom == null)
+                {
+                    przystankiPom.Add(p);
+                }
+                else
+                {
+                    foreach (Linia l in p.linie) 
+                    {
+                        przystanekWPom.dodajLinie(l);
+                    }
+                }   
+
+            }
+            przystanki = przystankiPom;        
+        }
+        private void search(string _from, string to, int nodes, int initialNodes, string previousLine, DateTime godzina) 
         {
             if (_from == to)//trafilem
             {
@@ -117,7 +90,7 @@ namespace komunikacja_test_1
                 foreach (Linia l in przystanki.Find(
                         delegate(Przystanek p)
                         {
-                            return p.id == _from;
+                            return p.nazwa == _from;
                         }
                         ).linie
                     )
@@ -126,9 +99,15 @@ namespace komunikacja_test_1
 
                     //sprawdz, czy wybrana linia ma taka godzine wyjazdu, zeby dojechac na obecny przystanek po obecnej godzinie
                     //i wybierz pierwsza taka godizne wyjazdu
-                    foreach (DateTime d in l.wyjazd) 
+                    //wybierajac sposrod wyjazdow dla odpowiedniego dnia (robocze/sobota/niedziela)
+                    
+                                            
+                    //dojscie tu oznacza ze sprawdzamy czas dla dobrego dnia
+                    List<DateTime> list = wyjazdyLiniiWDzien(l,godzina);
+                    if (list == null) continue;
+                    foreach (DateTime d in list)
                     {
-                        if (godzina > d.Add(new TimeSpan(0,l.czasDo(_from),0) ) )
+                        if (godzina > d.Add(new TimeSpan(0, l.czasDo(_from), 0)))
                         {
                             continue;
                         }
@@ -137,8 +116,9 @@ namespace komunikacja_test_1
                             wyjazdLinii = d;
                             break;
                         }
-                    
                     }
+                    
+                   
                     // jesli nie ma juz godziny odjazdu ktora by spelniala powyzsze wymaganie, pomin linie;
                     if (wyjazdLinii.Year == 100) continue;
 
@@ -161,7 +141,7 @@ namespace komunikacja_test_1
                     //dodaj info do dorogi algorytmu jaka linia, na jaki przystanek i ile musiales czekac na autobus
                     droga.Add(new Wynik(l.numerLinii, nastPrzyst.czas,(int)zaIleOdjezdza.TotalMinutes));
 
-                    //oblicz ktora bedzie godzina jak dojedzie na natepny przystanek (czekan ie na autobus + jazda)
+                    //oblicz ktora bedzie godzina jak dojedzie na natepny przystanek (czekanie na autobus + jazda)
                     int h, m;
                     h = godzina.Hour + zaIleOdjezdza.Hours;
                     m = godzina.Minute + zaIleOdjezdza.Minutes + l.czasZDo(_from, nastPrzyst.nastPrzyst);
@@ -170,17 +150,42 @@ namespace komunikacja_test_1
                     //rekurencja - podzial na kontunuacje linii i zmiane linii            
                     if ((previousLine == l.numerLinii) || previousLine == "z buta")
                     {
-                        search(nastPrzyst.nastPrzyst, to, nodes, initialNodes, l.numerLinii,new DateTime(2000, 11, 11, h+m/60,m%60,0));
+                        search(nastPrzyst.nastPrzyst, to, nodes, initialNodes, l.numerLinii, new DateTime(godzina.Year, godzina.Month, godzina.Day, h + m / 60, m % 60, 0));
                     }
                     else 
                     {
-                        search(nastPrzyst.nastPrzyst, to, nodes - 1, initialNodes, l.numerLinii,new DateTime(2000, 11, 11, h+m/60,m%60,0));
+                        search(nastPrzyst.nastPrzyst, to, nodes - 1, initialNodes, l.numerLinii, new DateTime(godzina.Year, godzina.Month, godzina.Day, h + m / 60, m % 60, 0));
                     }
                     
                 }
             }
             if(droga.Count > 0)
             droga.RemoveAt(droga.Count - 1);
+        }
+        private List<DateTime> wyjazdyLiniiWDzien(Linia l, DateTime g)
+        {
+            string dzien="";
+
+            if (g.DayOfWeek == DayOfWeek.Saturday)
+            {
+                dzien = "Sobota";
+            }
+            if (g.DayOfWeek == DayOfWeek.Sunday)
+            {
+                dzien = "Niedziela";
+            }
+            if (g.DayOfWeek != DayOfWeek.Sunday &&
+                g.DayOfWeek != DayOfWeek.Saturday)
+            {
+                dzien = "w dni robocze";
+            }
+
+            foreach (Wyjazd w in l.wyjazd) 
+            {
+                if (w.typDnia == dzien) return w.wyjazd;
+            }
+            //nie ma odpowiednich wyjazdow
+            return null;
         }
         private int czasJazdyZPetliNaPrzystanek(string _linia, string to) 
         {
@@ -193,7 +198,7 @@ namespace komunikacja_test_1
 
             for (int i = 0; i < linia.przystanki.Count; i++)
             {
-                if (linia.przystanki[i].id == to)
+                if (linia.przystanki[i].nazwa == to)
                 {
                     return linia.czasJazdy[i];
                 }
@@ -207,7 +212,7 @@ namespace komunikacja_test_1
 
             foreach (Przystanek p in l.przystanki) 
             {
-                if (p.id == _from)
+                if (p.nazwa == _from)
                 {
                     break;
                 }
@@ -218,7 +223,7 @@ namespace komunikacja_test_1
             }
             if (count + 1 >= l.przystanki.Count) return null;
 
-            return new NastPrzyst(l.przystanki[count + 1].id, l.czasJazdy[count + 1] - l.czasJazdy[count]);
+            return new NastPrzyst(l.przystanki[count + 1].nazwa, l.czasJazdy[count + 1] - l.czasJazdy[count]);
 
         
         }
@@ -229,14 +234,14 @@ namespace komunikacja_test_1
             foreach (Linia l in (przystanki.Find(
                 delegate(Przystanek prz) 
                 {
-                    return prz.id == _from;
+                    return prz.nazwa == _from;
                 }
                 )).linie)
             {
                 Przystanek toZnaleziony = l.przystanki.Find(
                                     delegate(Przystanek prz)
                                     {
-                                        return prz.id == to;
+                                        return prz.nazwa == to;
                                     }
                     );
 
@@ -263,13 +268,417 @@ namespace komunikacja_test_1
                 (int)numericUpDown1.Value, 
                 (int)numericUpDown1.Value,
                 "z buta",
-                new DateTime(2000, 11, 11, Int32.Parse(textBox1.Text), Int32.Parse(textBox2.Text), Int32.Parse(textBox3.Text))
+                new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, Int32.Parse(textBox1.Text), Int32.Parse(textBox2.Text), Int32.Parse(textBox3.Text))
             );
             normalizeResults();
             showResults();
             wyniki.Clear();
             droga.Clear();
             rozwiazania.Clear();
+            
+            
+
+        }
+   /*     private void parseFile(string strPath)
+        {
+            //zle dodaje przystanki - ciagle pierwszy...
+            //zle liczy czas jazdy
+            //
+            XmlTextReader xmlReader = new XmlTextReader(strPath);
+            bool pierwszyPrzystanek = true;
+            int aktualnaGodzina=0,aktualnaMinuta=0;
+            string dzien = "";
+            Przystanek aktualnieObrabianyPrzystanek = null;
+            string nazwaLinii = "", typLinii = "", idPrzystanku = "", nazwaPrzystanku = "", ulicaPrzystanku = "";
+            // Read the line of the xml file
+            while (xmlReader.Read())
+            {
+                switch (xmlReader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        
+                        //zapisz dane obrabianej linii
+                        if (xmlReader.Name == "linia")
+                        {
+                            xmlReader.MoveToAttribute(0);
+                            nazwaLinii = xmlReader.Value;
+
+                            xmlReader.MoveToAttribute(1);
+                            typLinii = xmlReader.Value;
+                            break;
+
+                        }
+                        //dodaj wariant linii do bazy
+                        if (xmlReader.Name == "wariant")
+                        { 
+                            linie.Add(new Linia(nazwaLinii,typLinii));
+                            pierwszyPrzystanek = true;
+                            break;
+                        }
+                        //utworz aktualnie obrabiany przystanek
+                        if (xmlReader.Name == "przystanek") 
+                        {
+                            xmlReader.MoveToAttribute(0);
+                            idPrzystanku = xmlReader.Value;
+
+                            xmlReader.MoveToAttribute(1);
+                            nazwaPrzystanku = xmlReader.Value;
+
+                            xmlReader.MoveToAttribute(2);
+                            ulicaPrzystanku = xmlReader.Value;
+
+                            //sprawdz czy taki przystanek juz jest
+                            aktualnieObrabianyPrzystanek = przystanki.Find(
+                                    delegate(Przystanek p)
+                                    {
+                                        return p.id == idPrzystanku;
+                                    }
+                                    );
+
+                            //jak go nie ma to go dodaj
+                            if (aktualnieObrabianyPrzystanek == null)
+                            {
+                                aktualnieObrabianyPrzystanek = new Przystanek(idPrzystanku, nazwaPrzystanku, ulicaPrzystanku);
+                                przystanki.Add(aktualnieObrabianyPrzystanek);
+                            }
+                            //dodaj do tego przystanku linie
+                            aktualnieObrabianyPrzystanek.dodajLinie(linie[linie.Count-1]);
+
+                            //jesli jest to pierwszy przystanek
+                            if (linie[linie.Count - 1].przystanki.Count == 0)
+                            {   
+                                //dodaj go do linii z czasem 0
+                                linie[linie.Count - 1].dodajPrzystanek(aktualnieObrabianyPrzystanek, 0);
+                                pierwszyPrzystanek = true;
+                            }
+                            else 
+                            {
+                                pierwszyPrzystanek = false;
+                            }
+                            break;
+
+                        }
+                        //zapisz dzien (roboczy/sobota...)
+                        if(xmlReader.Name == "dzien")
+                        {
+                            xmlReader.MoveToAttribute(0);
+                            dzien = xmlReader.Value;
+                            break;
+                        }
+                        //zapisz godzine
+                        if (xmlReader.Name == "godz")
+                        {
+                            xmlReader.MoveToAttribute(0);
+                            aktualnaGodzina = Int32.Parse( xmlReader.Value);
+                            break;
+                        }
+                        //przerabianie minut;
+                        if (xmlReader.Name == "min")
+                        {
+                            xmlReader.MoveToAttribute(0);
+                            aktualnaMinuta = Int32.Parse(xmlReader.Value);
+
+                            //jesli przerabiamy pierwszy przystanek linii to kazda godzina jest godzina odjazdu z petli - trzeba je pododawac do linii
+                            if (pierwszyPrzystanek)
+                            {
+                                //dodaj nowy wyjazd dla linii - typ dnia (roboczy, sobota...) i pierwsza godizne
+                                linie[linie.Count - 1].wyjazd.Add(new Wyjazd(dzien, new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, aktualnaGodzina%24, aktualnaMinuta, 0)));
+                                
+                                //znacznik dzien oznacza, ze juz nie ma wiecej godzin
+                                while (xmlReader.Read() && xmlReader.Name != "dzien") 
+                                {
+                                    if (xmlReader.Name == "godz" && xmlReader.HasAttributes) 
+                                    {
+                                        xmlReader.MoveToAttribute(0);
+                                        aktualnaGodzina = Int32.Parse(xmlReader.Value);
+                                    }
+                                    if (xmlReader.Name == "min" && xmlReader.HasAttributes)
+                                    {
+                                        xmlReader.MoveToAttribute(0);
+                                        aktualnaMinuta = Int32.Parse(xmlReader.Value);
+
+                                        //do obecnie przerabianego dnia (roboczy, sobota...) dodaj kolejne godziny
+                                        linie[linie.Count - 1].wyjazd.Find(
+                                            delegate(Wyjazd w)
+                                            {
+                                                return w.typDnia == dzien;
+                                            }
+                                            ).wyjazd.Add(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, aktualnaGodzina % 24, aktualnaMinuta, 0));
+                                    }
+                                }
+                            }
+                            //jesli jest to kolejny przystanek linii, to czas dojazdu na ten przystanek to pierwszy czas wyjazdu z petli i pierwszy autobus na tym przystanku
+                            else 
+                            {
+                                //znajdzi pierwsza godzine wyjazd z petli
+                                DateTime wyjazd = linie[linie.Count - 1].wyjazd.Find(
+                                    delegate(Wyjazd w)
+                                    {
+                                        return w.typDnia == dzien;
+                                    }
+                                    ).wyjazd[0];
+
+                                //stworz godzine przyjazdu na podstawie odczytanych wczesniej danych
+                                DateTime przyjazd = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day,aktualnaGodzina%24,aktualnaMinuta,0);
+
+                                TimeSpan czas = przyjazd - wyjazd;
+
+                                //dodaj ten przystanek do linii z obliczonym czasem dojazdu
+                                linie[linie.Count - 1].dodajPrzystanek(aktualnieObrabianyPrzystanek, (int)czas.TotalMinutes);
+                                
+                                //dopoki nie ma znacznika przystanek to sa tam godziny ktore nas juz nie interesuja. ta petla je pomija
+                                while (xmlReader.Name != "przystanek") xmlReader.Read();
+
+                                //dopoki nie ma znacznika wariant to sa tam przystanki, dla ktorych nalezy obliczyc czas dojazdu
+                                while (xmlReader.Name != "wariant") 
+                                {
+                                    //tak jak poprzednio stworz dane o przystanku i jesli go nie ma to go dodaj
+                                    if (xmlReader.Name == "przystanek" && xmlReader.HasAttributes)
+                                    {
+                                        xmlReader.MoveToAttribute(0);
+                                        idPrzystanku = xmlReader.Value;
+
+                                        xmlReader.MoveToAttribute(1);
+                                        nazwaPrzystanku = xmlReader.Value;
+
+                                        xmlReader.MoveToAttribute(2);
+                                        ulicaPrzystanku = xmlReader.Value;
+
+                                        aktualnieObrabianyPrzystanek = przystanki.Find(
+                                                delegate(Przystanek p)
+                                                {
+                                                    return p.id == idPrzystanku;
+                                                }
+                                                );
+                                        if (aktualnieObrabianyPrzystanek == null)
+                                        {
+                                            aktualnieObrabianyPrzystanek = new Przystanek(idPrzystanku, nazwaPrzystanku, ulicaPrzystanku);
+                                            przystanki.Add(aktualnieObrabianyPrzystanek);
+                                        }
+                                        aktualnieObrabianyPrzystanek.dodajLinie(linie[linie.Count - 1]);
+
+                                        //poniewaz ostatni przystanek nie ma godzin odjazdow, to nie ma tam znacznika <godz> ktory jest wylapywany przez ten algorytm
+                                        //2 przyeczytania nie szkodza, gdyz albo trafimy na znacnzik tabliczka (nie ostatni przystanek), ktory jest ignorowany przez algorytm
+                                        //albo trafimy na znacznik </przystanek> co oznacza, ze jest to ostatni przystanek linii i czas jazdy wynosi tyle samo co na przedostatni
+                                        xmlReader.Read();
+                                        xmlReader.Read();
+                                        if (xmlReader.NodeType == XmlNodeType.EndElement) 
+                                        {
+                                            //dzien ma 1440 minut, dlatego jesli autobus wyjezdza przed polnoca a dojezdza po, to nalezy poprawic wynik
+                                            if (czas.TotalMinutes < 0)
+                                            {
+                                                linie[linie.Count - 1].dodajPrzystanek(aktualnieObrabianyPrzystanek, (int)czas.TotalMinutes + 1440);
+                                            }
+                                            else
+                                            {
+                                                linie[linie.Count - 1].dodajPrzystanek(aktualnieObrabianyPrzystanek, (int)czas.TotalMinutes);
+                                            }
+                                        
+                                        }
+                                    }
+
+                                    if (xmlReader.Name == "godz" && xmlReader.HasAttributes)
+                                    {
+                                        xmlReader.MoveToAttribute(0);
+                                        aktualnaGodzina = Int32.Parse( xmlReader.Value);
+                                        continue;
+                                    }
+                                    if (xmlReader.Name == "min" && xmlReader.HasAttributes)
+                                    {
+                                        xmlReader.MoveToAttribute(0);
+                                        aktualnaMinuta = Int32.Parse(xmlReader.Value);
+                                        przyjazd = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, aktualnaGodzina % 24, aktualnaMinuta, 0);
+
+                                        czas = przyjazd - wyjazd;
+                                        if (czas.TotalMinutes < 0)
+                                        {
+                                            linie[linie.Count - 1].dodajPrzystanek(aktualnieObrabianyPrzystanek, (int)czas.TotalMinutes + 1440);
+                                        }
+                                        else
+                                        {
+                                            linie[linie.Count - 1].dodajPrzystanek(aktualnieObrabianyPrzystanek, (int)czas.TotalMinutes);
+                                        }
+                                        while (xmlReader.Name != "tabliczka") xmlReader.Read();
+                                    }
+                                    xmlReader.Read();
+                                
+                                }
+                            }
+                        
+                        }
+
+                            
+                        
+                        break;
+                    case XmlNodeType.EndElement:
+                        
+                        break;
+                    case XmlNodeType.Text:
+
+                        richTextBox1.Text += xmlReader.Value + "\n";
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }*/
+        private void parseFile2(string strPath) 
+        {
+            List<DateTime> czasy = new List<DateTime>();
+            int godzina=0,minuta=0;
+            Przystanek aktualnyPrzystanek = null;
+            string dzien = "";
+            string nazwaLinii = "", typLinii = "", nazwaWariantu="", idPrzystanku = "", nazwaPrzystanku = "", ulicaPrzystanku = "";
+            bool pierwszyPrzystanek = true;
+            XmlTextReader xmlReader = new XmlTextReader(strPath);
+            while(xmlReader.Read())
+            {
+                switch (xmlReader.NodeType) 
+                {
+                    case XmlNodeType.Element:
+                        {
+                            switch (xmlReader.Name) 
+                            {
+                                case "linia":
+                                    {
+                                        xmlReader.MoveToAttribute(0);
+                                        nazwaLinii = xmlReader.Value;
+
+                                        xmlReader.MoveToAttribute(1);
+                                        typLinii = xmlReader.Value;
+                                        break;
+                                    }
+                                case "wariant":
+                                    {
+                                        xmlReader.MoveToAttribute(1);
+                                        nazwaWariantu = xmlReader.Value;
+
+                                        linie.Add(new Linia(nazwaLinii,typLinii,nazwaWariantu));
+                                        pierwszyPrzystanek = true;
+
+                                        while (xmlReader.Read() && xmlReader.Name != "wariant") 
+                                        {
+                                            switch (xmlReader.NodeType) 
+                                            {
+                                                case XmlNodeType.Element: 
+                                                    {
+                                                        switch (xmlReader.Name) 
+                                                        {
+                                                            case "przystanek":
+                                                                {
+                                                                    xmlReader.MoveToAttribute(0);
+                                                                    idPrzystanku = xmlReader.Value;
+
+                                                                    xmlReader.MoveToAttribute(1);
+                                                                    nazwaPrzystanku = xmlReader.Value;
+
+                                                                    xmlReader.MoveToAttribute(2);
+                                                                    ulicaPrzystanku = xmlReader.Value;
+
+                                                                    //sprawdz czy taki przystanek juz jest
+                                                                    aktualnyPrzystanek = przystanki.Find(
+                                                                            delegate(Przystanek p)
+                                                                            {
+                                                                                return p.nazwa == nazwaPrzystanku;
+                                                                            }
+                                                                            );
+
+                                                                    //jak go nie ma to go dodaj
+                                                                    if (aktualnyPrzystanek == null)
+                                                                    {
+                                                                        aktualnyPrzystanek = new Przystanek(idPrzystanku, nazwaPrzystanku, ulicaPrzystanku);
+                                                                        przystanki.Add(aktualnyPrzystanek);
+                                                                    }
+                                                                    //dodaj do tego przystanku linie
+                                                                    aktualnyPrzystanek.dodajLinie(linie[linie.Count - 1]);
+                                                                    
+                                                                    if (linie[linie.Count - 1].przystanki.Count == 0)
+                                                                    {
+                                                                        //dodaj go do linii z czasem 0
+                                                                        linie[linie.Count - 1].dodajPrzystanek(aktualnyPrzystanek, 0);
+                                                                        pierwszyPrzystanek = true;
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        pierwszyPrzystanek = false;
+                                                                    }
+                                                                    break;
+                                                                }
+                                                            case "dzien":
+                                                                {
+                                                                    xmlReader.MoveToAttribute(0);
+                                                                    dzien = xmlReader.Value;
+                                                                    break;
+                                                                }
+                                                            case "godz":
+                                                                {
+                                                                    xmlReader.MoveToAttribute(0);
+                                                                    godzina = Int32.Parse(xmlReader.Value);
+                                                                    break;
+                                                                }
+                                                            case "min":
+                                                                {
+                                                                    xmlReader.MoveToAttribute(0);
+                                                                    minuta = Int32.Parse(xmlReader.Value);
+                                                                    break;
+                                                                }
+                                                            default: break;
+                                                        }
+                                                        break;
+                                                    }
+                                                case XmlNodeType.EndElement: 
+                                                    {
+                                                        if (pierwszyPrzystanek)
+                                                        {
+                                                            if (xmlReader.Name == "min")
+                                                            {
+                                                                czasy.Add(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, godzina, minuta, 0));
+                                                            }
+                                                            if (xmlReader.Name == "dzien")
+                                                            {
+                                                                linie[linie.Count - 1].wyjazd.Add(new Wyjazd(dzien, czasy));
+                                                            }
+                                                        }
+                                                        else 
+                                                        {
+                                                            if (xmlReader.Name == "min")
+                                                            {
+                                                                DateTime wyjazd = linie[linie.Count - 1].wyjazd.Find(
+                                                                    delegate(Wyjazd w)
+                                                                    {
+                                                                        return w.typDnia == dzien;
+                                                                    }
+                                                                    ).wyjazd[0];
+
+                                                                DateTime przyjazd = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, godzina, minuta, 0);
+
+                                                                TimeSpan czasDojazdu = przyjazd - wyjazd;
+
+                                                                linie[linie.Count - 1].dodajPrzystanek(aktualnyPrzystanek, (int)czasDojazdu.TotalMinutes);
+
+                                                                while (xmlReader.Name != "dzien" && xmlReader.Read());
+                                                            }
+                                                        }
+                                                        break;
+                                                    }
+                                                default: break;
+                                                
+                                            }
+                                        
+                                        }
+
+                                        break;
+                                    }
+                                //default dla Element
+                                default: break;
+                            }
+                            break;
+                        }
+                    //default glownego switcha
+                    default: break;
+                }
+            }
+        
         }
         private void showResults() 
         {
@@ -307,6 +716,26 @@ namespace komunikacja_test_1
 
 
         }
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            comboBox1.Items.Clear();
+
+            foreach (Przystanek p in przystanki)
+            {
+                if (p.nazwa.ToLower().Contains(textBox4.Text.ToLower())) comboBox1.Items.Add(p.nazwa);
+            }
+            comboBox1.Sorted = true;
+        }
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+            comboBox2.Items.Clear();
+
+            foreach (Przystanek p in przystanki)
+            {
+                if (p.nazwa.ToLower().Contains(textBox5.Text.ToLower())) comboBox2.Items.Add(p.nazwa);
+            }
+            comboBox2.Sorted = true;
+        }
 
     }
     
@@ -340,9 +769,9 @@ namespace komunikacja_test_1
     {
         public string nastPrzyst;
         public int czas;
-        public NastPrzyst(string id, int t) 
+        public NastPrzyst(string nazwa, int t) 
         {
-            nastPrzyst = id;
+            nastPrzyst = nazwa;
             czas = t;
         }
     }
@@ -362,11 +791,15 @@ namespace komunikacja_test_1
     public class Przystanek 
     {
         public string id;
+        public string nazwa;
+        public string ulica;
         public List<Linia> linie = new List<Linia>();
 
-        public Przystanek(string _id) 
+        public Przystanek(string _id,string _nazwa,string _ulica) 
         {
             id = _id;
+            nazwa = _nazwa;
+            ulica = _ulica;
         }
         public void dodajLinie(Linia linia)
         {
@@ -374,16 +807,33 @@ namespace komunikacja_test_1
         }
     
     }
+    public class Wyjazd 
+    {
+        public List<DateTime> wyjazd = new List<DateTime>();
+        public string typDnia;
+        public Wyjazd(string _typDnia, List<DateTime> w) 
+        {
+            typDnia = _typDnia;
+            foreach (DateTime d in w) 
+            {
+                wyjazd.Add(new DateTime(d.Year, d.Month, d.Day, d.Hour, d.Minute, 0));
+            }
+        }
+    }
     public class Linia 
     {
         public string numerLinii;
-        public List<DateTime> wyjazd = new List<DateTime>();
+        public string typLinii;
+        public string nazwaWariantu;
+        public List<Wyjazd> wyjazd = new List<Wyjazd>();
         public List<Przystanek> przystanki = new List<Przystanek>();
         public List<int> czasJazdy = new List<int>();
 
-        public Linia(string _numerLinii) 
+        public Linia(string _numerLinii,string typ,string wariant) 
         {
             numerLinii = _numerLinii;
+            typLinii = typ;
+            nazwaWariantu = wariant;
         }
         public void dodajPrzystanek(Przystanek przystanek,int _czasJazdy)
         {
@@ -396,7 +846,7 @@ namespace komunikacja_test_1
             int toTimeIndex = 0;
             foreach (Przystanek p in przystanki) 
             {
-                if (p.id == _from) 
+                if (p.nazwa == _from) 
                 {
                     break;
                 }
@@ -404,7 +854,7 @@ namespace komunikacja_test_1
             }
             foreach (Przystanek p in przystanki) 
             {
-                if (p.id == to) 
+                if (p.nazwa == to) 
                 {
                     break;
                 }
@@ -417,7 +867,7 @@ namespace komunikacja_test_1
             int toTimeIndex = 0;
             foreach (Przystanek p in przystanki)
             {
-                if (p.id == to)
+                if (p.nazwa == to)
                 {
                     break;
                 }
