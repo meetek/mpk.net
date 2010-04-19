@@ -39,31 +39,35 @@ namespace komunikacja_test_1
             linie.Add(new Linia("5"));
             linie.Add(new Linia("6"));
 
-            linie[0].wyjazd = new DateTime(2000,11,11,5,0,0);
+            linie[0].wyjazd.Add(new DateTime(2000, 11, 11, 5, 0, 0));
+            linie[0].wyjazd.Add(new DateTime(2000, 11, 11, 5, 6, 0));
             
             linie[0].dodajPrzystanek(przystanki[0], 0);
             linie[0].dodajPrzystanek(przystanki[1], 10);
             linie[0].dodajPrzystanek(przystanki[2], 110);
 
 
-            linie[1].wyjazd = new DateTime(2000, 11, 11, 5, 10, 0);
+            linie[1].wyjazd.Add(new DateTime(2000, 11, 11, 5, 10, 0));
             linie[1].dodajPrzystanek(przystanki[5], 0);
             linie[1].dodajPrzystanek(przystanki[1], 5);
             linie[1].dodajPrzystanek(przystanki[3], 13);
 
-            linie[2].wyjazd = new DateTime(2000, 11, 11, 5, 24, 0);
+            linie[2].wyjazd.Add(new DateTime(2000, 11, 11, 5, 22, 0));
+            linie[2].wyjazd.Add(new DateTime(2000, 11, 11, 6, 27, 0));
+            linie[2].wyjazd.Add(new DateTime(2000, 11, 11, 6, 30, 0));
             linie[2].dodajPrzystanek(przystanki[3], 0);
             linie[2].dodajPrzystanek(przystanki[4], 9);
 
-            linie[3].wyjazd = new DateTime(2000, 11, 11, 5, 35, 0);
+            linie[3].wyjazd.Add(new DateTime(2000, 11, 11, 5, 35, 0));
+            linie[3].wyjazd.Add(new DateTime(2000, 11, 11, 6, 50, 0));
             linie[3].dodajPrzystanek(przystanki[4], 0);
             linie[3].dodajPrzystanek(przystanki[2], 3);
 
-            linie[4].wyjazd = new DateTime(2000, 11, 11, 5, 0, 0);
+            linie[4].wyjazd.Add(new DateTime(2000, 11, 11, 5, 0, 0));
             linie[4].dodajPrzystanek(przystanki[0], 0);
             linie[4].dodajPrzystanek(przystanki[5], 10);
 
-            linie[5].wyjazd = new DateTime(2000, 11, 11, 5, 20, 0);
+            linie[5].wyjazd.Add(new DateTime(2000, 11, 11, 5, 20, 0));
             linie[5].dodajPrzystanek(przystanki[5], 0);
             linie[5].dodajPrzystanek(przystanki[2], 50);
 
@@ -95,7 +99,6 @@ namespace komunikacja_test_1
         }
         private void search(string _from, string to,int nodes,int initialNodes,string previousLine,DateTime godzina) 
         {
-            //DateTime godzina = new DateTime(2000, 11, 11, g.Hour, g.Minute, g.Second);
             if (_from == to)//trafilem
             {
                 List<Wynik> pom = new List<Wynik>();
@@ -119,20 +122,43 @@ namespace komunikacja_test_1
                         ).linie
                     )
                 {
+                    DateTime wyjazdLinii = new DateTime(100,11,11,0,0,0);
 
+                    //sprawdz, czy wybrana linia ma taka godzine wyjazdu, zeby dojechac na obecny przystanek po obecnej godzinie
+                    //i wybierz pierwsza taka godizne wyjazdu
+                    foreach (DateTime d in l.wyjazd) 
+                    {
+                        if (godzina > d.Add(new TimeSpan(0,l.czasDo(_from),0) ) )
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            wyjazdLinii = d;
+                            break;
+                        }
+                    
+                    }
+                    // jesli nie ma juz godziny odjazdu ktora by spelniala powyzsze wymaganie, pomin linie;
+                    if (wyjazdLinii.Year == 100) continue;
+
+                    //jesli juz nie ma przesiadek i wybrano inna linie niz poprzednia - pomin te linie
                     if (nodes == 0 && l.numerLinii != previousLine && previousLine != "z buta") continue;
+
+                    //dowiedz sie jaki jest nasteepny przystanek wybranej linii
                     NastPrzyst nastPrzyst = jedzLinia(l, _from);
 
                     //jesli nie ma dalszych przystankow jakiejs linii pomin ja
-                    
                     if (nastPrzyst == null) continue;
 
                     //jesli ta linia juz odjechala - pomin ja
-                    DateTime odjazdLiniiZPrzystanku = l.wyjazd.AddMinutes(l.czasDo(_from));
+                    DateTime odjazdLiniiZPrzystanku = wyjazdLinii.AddMinutes(l.czasDo(_from));
                     if (godzina > odjazdLiniiZPrzystanku) continue;
 
+                    //oblicz za ile odjezdza ta linia z tego przystanku
                     TimeSpan zaIleOdjezdza = odjazdLiniiZPrzystanku - godzina;
                     
+                    //dodaj info do dorogi algorytmu jaka linia, na jaki przystanek i ile musiales czekac na autobus
                     droga.Add(new Wynik(l.numerLinii, nastPrzyst.czas,(int)zaIleOdjezdza.TotalMinutes));
 
                     //oblicz ktora bedzie godzina jak dojedzie na natepny przystanek (czekan ie na autobus + jazda)
@@ -141,7 +167,7 @@ namespace komunikacja_test_1
                     m = godzina.Minute + zaIleOdjezdza.Minutes + l.czasZDo(_from, nastPrzyst.nastPrzyst);
                      
 
-                                       
+                    //rekurencja - podzial na kontunuacje linii i zmiane linii            
                     if ((previousLine == l.numerLinii) || previousLine == "z buta")
                     {
                         search(nastPrzyst.nastPrzyst, to, nodes, initialNodes, l.numerLinii,new DateTime(2000, 11, 11, h+m/60,m%60,0));
@@ -230,7 +256,7 @@ namespace komunikacja_test_1
         private void button1_Click(object sender, EventArgs e)
         {
             richTextBox1.Text = "";
-           // godzina = new DateTime(2000, 11, 11, Int32.Parse(textBox1.Text), Int32.Parse(textBox2.Text), Int32.Parse(textBox3.Text));
+           
             search(
                 (string)comboBox1.SelectedItem,
                 (string)comboBox2.SelectedItem,
@@ -243,6 +269,7 @@ namespace komunikacja_test_1
             showResults();
             wyniki.Clear();
             droga.Clear();
+            rozwiazania.Clear();
         }
         private void showResults() 
         {
@@ -300,7 +327,7 @@ namespace komunikacja_test_1
                 linie.Add(w[i].linia);
                 liczbaPrzystankow.Add(w[i].liczbaPrzystankow);
                 czasWLinii.Add(w[i].czas);
-                czasCalkowity += w[i].czas;
+                czasCalkowity += w[i].czas + w[i].czekaj;
             
             }
 
@@ -350,7 +377,7 @@ namespace komunikacja_test_1
     public class Linia 
     {
         public string numerLinii;
-        public DateTime wyjazd;
+        public List<DateTime> wyjazd = new List<DateTime>();
         public List<Przystanek> przystanki = new List<Przystanek>();
         public List<int> czasJazdy = new List<int>();
 
