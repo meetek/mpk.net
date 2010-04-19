@@ -1,0 +1,32 @@
+C:\Documents and Settings\Donald\Moje dokumenty\Visual Studio 2008\Projects\komunikacja test 1\komunikacja test 1\bin\Debug\komunikacja test 1.exe
+C:\Documents and Settings\Donald\Moje dokumenty\Visual Studio 2008\Projects\komunikacja test 1\komunikacja test 1\bin\Debug\komunikacja test 1.pdb
+C:\Documents and Settings\Donald\Moje dokumenty\Visual Studio 2008\Projects\komunikacja test 1\komunikacja test 1\obj\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\Donald\Moje dokumenty\Visual Studio 2008\Projects\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja_test_1.Form1.resources
+C:\Documents and Settings\Donald\Moje dokumenty\Visual Studio 2008\Projects\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja_test_1.Properties.Resources.resources
+C:\Documents and Settings\Donald\Moje dokumenty\Visual Studio 2008\Projects\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja test 1.csproj.GenerateResource.Cache
+C:\Documents and Settings\Donald\Moje dokumenty\Visual Studio 2008\Projects\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja test 1.exe
+C:\Documents and Settings\Donald\Moje dokumenty\Visual Studio 2008\Projects\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja test 1.pdb
+C:\Documents and Settings\ue06\Moje dokumenty\Pobieranie\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja test 1.exe
+C:\Documents and Settings\ue06\Moje dokumenty\Pobieranie\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja test 1.pdb
+C:\Documents and Settings\ue06\Moje dokumenty\Pobieranie\komunikacja test 1\komunikacja test 1\komunikacja test 1\bin\Debug\komunikacja test 1.exe
+C:\Documents and Settings\ue06\Moje dokumenty\Pobieranie\komunikacja test 1\komunikacja test 1\komunikacja test 1\bin\Debug\komunikacja test 1.pdb
+C:\Documents and Settings\ue06\Moje dokumenty\Pobieranie\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\ue06\Moje dokumenty\Pobieranie\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja_test_1.Form1.resources
+C:\Documents and Settings\ue06\Moje dokumenty\Pobieranie\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja_test_1.Properties.Resources.resources
+C:\Documents and Settings\ue06\Moje dokumenty\Pobieranie\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja test 1.csproj.GenerateResource.Cache
+C:\Documents and Settings\Administrator\Pulpit\b\b\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja test 1.exe
+C:\Documents and Settings\Administrator\Pulpit\b\b\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja test 1.pdb
+C:\Documents and Settings\Administrator\Pulpit\b\b\komunikacja test 1\komunikacja test 1\komunikacja test 1\bin\Debug\komunikacja test 1.exe
+C:\Documents and Settings\Administrator\Pulpit\b\b\komunikacja test 1\komunikacja test 1\komunikacja test 1\bin\Debug\komunikacja test 1.pdb
+C:\Documents and Settings\Administrator\Pulpit\b\b\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\Administrator\Pulpit\b\b\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja_test_1.Form1.resources
+C:\Documents and Settings\Administrator\Pulpit\b\b\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja_test_1.Properties.Resources.resources
+C:\Documents and Settings\Administrator\Pulpit\b\b\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja test 1.csproj.GenerateResource.Cache
+E:\Moje bzdury\Projekty\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja test 1.exe
+E:\Moje bzdury\Projekty\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja test 1.pdb
+E:\Moje bzdury\Projekty\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\ResolveAssemblyReference.cache
+E:\Moje bzdury\Projekty\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja_test_1.Form1.resources
+E:\Moje bzdury\Projekty\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja_test_1.Properties.Resources.resources
+E:\Moje bzdury\Projekty\komunikacja test 1\komunikacja test 1\komunikacja test 1\obj\Debug\komunikacja test 1.csproj.GenerateResource.Cache
+E:\Moje bzdury\Projekty\komunikacja test 1\komunikacja test 1\komunikacja test 1\bin\Debug\komunikacja test 1.exe
+E:\Moje bzdury\Projekty\komunikacja test 1\komunikacja test 1\komunikacja test 1\bin\Debug\komunikacja test 1.pdb
